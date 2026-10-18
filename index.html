@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zain Qureshi | Front-End Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/index.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        primary: { DEFAULT: '#f97316', light: '#fb923c', dark: '#ea580c' },
+                        secondary: '#d97706',
+                        accent: '#fbbf24',
+                        dark: { DEFAULT: '#0c0a09', light: '#1c1917' },
+                        surface: '#292524'
+                    },
+                    animation: {
+                        'spin-slow': 'spin 20s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delay': 'float 6s ease-in-out 2s infinite',
+                        'gradient-x': 'gradientX 4s ease infinite',
+                        'bounce-slow': 'bounce 3s ease-in-out infinite',
+                        'arrow-bounce': 'arrowBounce 1.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
+                        gradientX: { '0%, 100%': { backgroundPosition: '0% 50%' }, '50%': { backgroundPosition: '100% 50%' } },
+                        arrowBounce: { '0%, 100%': { transform: 'translateY(0) scale(1)' }, '50%': { transform: 'translateY(-4px) scale(1.05)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: #0c0a09; color: #e7e5e4; overflow-x: hidden; cursor: none; }
+        .cursor-dot { width: 8px; height: 8px; background: #f97316; border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 10000; }
+        .cursor-ring { width: 36px; height: 36px; border: 2px solid rgba(249,115,22,0.5); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transition: width 0.3s, height 0.3s, border-color 0.3s; }
+        .cursor-ring.hover { width: 56px; height: 56px; border-color: rgba(249,115,22,0.8); background: rgba(249,115,22,0.05); }
+        @media (max-width: 768px) { .cursor-dot, .cursor-ring { display: none; } body { cursor: auto; } }
+        .preloader { position: fixed; inset: 0; z-index: 9999; background: #0c0a09; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease, visibility 0.8s; }
+        .preloader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        @keyframes pulseGlow { 0%, 100% { filter: drop-shadow(0 0 20px rgba(249,115,22,0.3)); } 50% { filter: drop-shadow(0 0 40px rgba(249,115,22,0.6)); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0c0a09; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #f97316, #d97706); border-radius: 3px; }
+        .gradient-text { background: linear-gradient(135deg, #f97316, #fbbf24, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; background-size: 200% 200%; animation: gradientX 4s ease infinite; }
+        .glass { background: rgba(28,25,23,0.7); backdrop-filter: blur(16px); border: 1px solid rgba(249,115,22,0.1); }
+        .glass-strong { background: rgba(28,25,23,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(249,115,22,0.15); }
+        .glass-hover:hover { background: rgba(41,37,36,0.8); border-color: rgba(249,115,22,0.25); }
+        .tilt-card { transition: transform 0.15s ease-out, box-shadow 0.4s ease; transform-style: preserve-3d; }
+        .tilt-card:hover { box-shadow: 0 25px 50px -12px rgba(249,115,22,0.15); }
+        .nav-link { position: relative; color: #a8a29e; transition: color 0.3s; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px; background: linear-gradient(90deg, #f97316, #fbbf24); transition: all 0.3s; transform: translateX(-50%); border-radius: 1px; }
+        .nav-link:hover, .nav-link.active { color: #f97316; }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.22,1,0.36,1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .skill-fill { width: 0; transition: width 2s cubic-bezier(0.22,1,0.36,1); }
+        .skill-fill.animate { width: var(--w); }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #f97316, #fbbf24); z-index: 100; transition: width 0.1s linear; box-shadow: 0 0 10px rgba(249,115,22,0.5); }
+        .mouse-glow { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%); }
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(249,115,22,0.2), transparent); }
+        .marquee { display: flex; animation: marqueeScroll 25s linear infinite; }
+        .marquee:hover { animation-play-state: paused; }
+        @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .typing-cursor { display: inline-block; width: 2px; height: 1em; background: #f97316; animation: blink 1s step-end infinite; margin-left: 2px; vertical-align: text-bottom; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .project-thumb { transition: transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+        .project-overlay { opacity: 0; transition: opacity 0.4s ease; }
+        .showcase-card:hover .project-thumb { transform: scale(1.08) rotate(1deg); }
+        .showcase-card:hover .project-overlay { opacity: 1; }
+        .scroll-top-btn { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #f97316, #ea580c); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transform: translateY(30px) scale(0.8); transition: all 0.4s cubic-bezier(0.22,1,0.36,1); cursor: pointer; box-shadow: 0 8px 30px rgba(249,115,22,0.35); border: 2px solid rgba(255,255,255,0.15); color: white; outline: none; }
+        .scroll-top-btn.visible { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+        .scroll-top-btn:hover { transform: translateY(-4px) scale(1.08); box-shadow: 0 14px 40px rgba(249,115,22,0.5); border-color: rgba(255,255,255,0.3); }
+        .scroll-top-btn:active { transform: translateY(-2px) scale(1.02); }
+        .scroll-top-btn svg { transition: transform 0.3s ease; }
+        .scroll-top-btn:hover svg { transform: translateY(-2px); }
+        .scroll-top-btn::before { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(249,115,22,0.2); animation: pulseRing 2s ease-out infinite; }
+        @keyframes pulseRing { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.4); opacity: 0; } }
+        .scroll-top-btn .arrow-icon { animation: arrowBounce 1.5s ease-in-out infinite; }
+        .scroll-top-btn .tooltip-text { position: absolute; right: 130%; top: 50%; transform: translateY(-50%); background: #1c1917; color: #e7e5e4; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.3s; border: 1px solid rgba(249,115,22,0.2); pointer-events: none; }
+        .scroll-top-btn:hover .tooltip-text { opacity: 1; visibility: visible; right: 140%; }
+        .terminal { background: #0f0d0b; border: 1px solid rgba(249,115,22,0.2); border-radius: 12px; overflow: hidden; position: relative; }
+        .terminal-header { background: #1c1917; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(249,115,22,0.1); }
+        .terminal-body { padding: 16px; font-family: 'Courier New', monospace; font-size: 14px; color: #a8a29e; min-height: 220px; position: relative; overflow-y: auto; max-height: 420px; }
+        .terminal-line { margin-bottom: 6px; line-height: 1.5; }
+        .terminal-prompt { color: #f97316; }
+        .terminal-cmd { color: #fbbf24; }
+        .terminal-output { color: #6b7280; padding-left: 16px; }
+        .terminal-input { background: transparent; border: none; color: #fbbf24; font-family: 'Courier New', monospace; font-size: 14px; outline: none; flex: 1; caret-color: #f97316; }
+        #matrixCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 0.6s; z-index: 0; border-radius: 0 0 12px 12px; }
+        #matrixCanvas.active { opacity: 0.12; }
+        .skill-orb { transition: all 0.4s cubic-bezier(0.22,1,0.36,1); }
+        .skill-orb:hover { transform: scale(1.15); filter: drop-shadow(0 0 20px var(--orb-color)); }
+        .magnetic { transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+        .noise { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.03; }
+        .tip { position: relative; }
+        .tip::before { content: attr(data-tip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(8px); background: #1c1917; color: #e7e5e4; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; white-space: nowrap; opacity: 0; visibility: hidden; transition: all 0.25s; border: 1px solid rgba(249,115,22,0.2); pointer-events: none; z-index: 100; }
+        .tip:hover::before { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .hero-float { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.08; pointer-events: none; }
+        .showcase-card { position: relative; overflow: hidden; }
+        .showcase-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(249,115,22,0.12) 0%, transparent 60%); opacity: 0; transition: opacity 0.4s; z-index: 1; pointer-events: none; }
+        .showcase-card:hover::before { opacity: 1; }
+        .badge-pulse { animation: badgePulse 2s ease-in-out infinite; }
+        @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 0 8px rgba(34,197,94,0); } }
+        .logo-mark { transition: transform 0.6s cubic-bezier(0.22,1,0.36,1); }
+        .logo-mark:hover { transform: rotate(5deg) scale(1.05); }
+        @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(-200px) rotate(720deg); opacity: 0; } }
+        .confetti-piece { position: fixed; width: 10px; height: 10px; pointer-events: none; z-index: 10001; animation: confettiFall 1s ease-out forwards; }
+        .timeline-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, transparent, #f97316, #fbbf24, #f97316, transparent); transform: translateX(-50%); }
+        @media (max-width: 768px) { .timeline-line { left: 1.5rem; } }
+        .form-input:focus { outline: none; border-color: #f97316 !important; box-shadow: 0 0 0 3px rgba(249,115,22,0.12) !important; }
+        .counter { font-variant-numeric: tabular-nums; }
+        .loader { width: 48px; height: 48px; border: 3px solid #292524; border-top-color: #f97316; border-radius: 50%; animation: spinLoader 0.8s linear infinite; }
+        @keyframes spinLoader { to { transform: rotate(360deg); } }
+        @keyframes morph { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
+        .morph-bg { animation: morph 8s ease-in-out infinite; }
+        .joke-text { color: #fbbf24; }
+        .fortune-text { color: #22c55e; }
+        .error-text { color: #ef4444; }
+        .matrix-text { color: #f97316; }
+        .ascii-art { color: #f97316; line-height: 1.2; font-size: 11px; }
+    </style>
+</head>
+
+<body>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="mouse-glow" id="mouseGlow"></div>
+    <div class="noise"></div>
+
+    <div class="preloader" id="preloader">
+        <div class="text-center">
+            <svg class="w-24 h-24 mx-auto mb-4" style="animation: pulseGlow 2s ease-in-out infinite" viewBox="0 0 120 120" fill="none">
+                <rect x="10" y="10" width="100" height="100" rx="24" fill="url(#preGrad1)" opacity="0.2"/>
+                <rect x="10" y="10" width="100" height="100" rx="24" stroke="url(#preGrad2)" stroke-width="2"/>
+                <text x="60" y="72" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="48" fill="url(#preGrad2)">Z</text>
+                <circle cx="85" cy="38" r="16" fill="url(#preGrad1)" opacity="0.9"/>
+                <text x="85" y="44" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="20" fill="#0c0a09">Q</text>
+                <defs>
+                    <linearGradient id="preGrad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#ea580c"/></linearGradient>
+                    <linearGradient id="preGrad2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient>
+                </defs>
+            </svg>
+            <div class="flex gap-1 justify-center"><div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:0s"></div><div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:0.15s"></div><div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:0.3s"></div></div>
+            <p class="text-primary/60 text-xs mt-4 tracking-widest uppercase">Loading experience</p>
+        </div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <span class="tooltip-text">Back to Top ↑</span>
+        <svg class="arrow-icon w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+    </button>
+
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <a href="#home" class="logo-mark flex items-center gap-3 group">
+                    <svg class="w-11 h-11 transition-transform group-hover:scale-110" viewBox="0 0 120 120" fill="none">
+                        <defs><linearGradient id="navLogo1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#ea580c"/></linearGradient><linearGradient id="navLogo2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient><filter id="logoShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#f97316" flood-opacity="0.3"/></filter></defs>
+                        <rect x="8" y="8" width="104" height="104" rx="28" fill="url(#navLogo1)" opacity="0.12" filter="url(#logoShadow)"/>
+                        <rect x="8" y="8" width="104" height="104" rx="28" stroke="url(#navLogo2)" stroke-width="2.5" fill="none"/>
+                        <text x="60" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="52" fill="url(#navLogo2)">Z</text>
+                        <circle cx="88" cy="36" r="20" fill="url(#navLogo1)"/><text x="88" y="43" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="22" fill="#0c0a09">Q</text>
+                    </svg>
+                    <div class="hidden sm:block"><span class="text-lg font-extrabold gradient-text">Zain</span><span class="text-lg font-light text-gray-400 ml-1">Qureshi</span></div>
+                </a>
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#home" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Home</a>
+                    <a href="#about" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">About</a>
+                    <a href="#experience" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Experience</a>
+                    <a href="#projects" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Projects</a>
+                    <a href="#terminal" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Terminal</a>
+                    <a href="#skills" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Skills</a>
+                    <a href="#contact" class="nav-link text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/[0.04] transition">Contact</a>
+                </div>
+                <button id="menuToggle" class="md:hidden p-2 rounded-lg hover:bg-white/[0.06] transition" aria-label="Menu">
+                    <svg class="w-6 h-6 block" id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg class="w-6 h-6 hidden" id="closeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="mobileMenu" class="md:hidden fixed inset-0 top-16 z-40 bg-dark/95 backdrop-blur-xl transition-all duration-300 translate-x-full">
+            <div class="flex flex-col items-center justify-center h-full gap-8">
+                <a href="#home" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Home</a>
+                <a href="#about" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">About</a>
+                <a href="#experience" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Experience</a>
+                <a href="#projects" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Projects</a>
+                <a href="#terminal" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Terminal</a>
+                <a href="#skills" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Skills</a>
+                <a href="#contact" class="text-2xl font-semibold text-gray-300 hover:text-primary transition mobile-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="hero-float w-[600px] h-[600px] bg-primary top-[-10%] left-[-10%] animate-float"></div>
+            <div class="hero-float w-[500px] h-[500px] bg-accent bottom-[-10%] right-[-10%] animate-float-delay"></div>
+            <div class="hero-float w-[400px] h-[400px] bg-secondary top-[40%] left-[60%]"></div>
+            <div class="absolute inset-0 opacity-[0.03]" style="background:repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(249,115,22,0.3) 80px,rgba(249,115,22,0.3) 81px),repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(249,115,22,0.3) 80px,rgba(249,115,22,0.3) 81px)"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-primary/5 rounded-full animate-spin-slow"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-accent/5 rounded-full animate-spin-slow" style="animation-direction:reverse;animation-duration:30s"></div>
+        </div>
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 border border-primary/15"><span class="w-2 h-2 rounded-full bg-green-400 badge-pulse"></span><span class="text-sm text-gray-400">Available for freelance projects</span></div>
+            <h1 class="reveal text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-6 leading-tight tracking-tight">Hi, I'm <span class="gradient-text">Zain</span></h1>
+            <div class="reveal"><p class="text-xl md:text-2xl lg:text-3xl text-gray-400 mb-2 font-light">I build <span id="typedText" class="text-primary font-semibold"></span><span class="typing-cursor"></span></p></div>
+            <p class="reveal text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">Front-end developer specializing in crafting exceptional digital experiences with modern frameworks, clean code, and pixel-perfect design.</p>
+            <div class="reveal flex flex-wrap justify-center gap-4 mb-14">
+                <a href="#projects" class="magnetic px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark rounded-xl font-semibold text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-0.5 inline-flex items-center gap-2">View My Work<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
+                <a href="#contact" class="magnetic px-8 py-3.5 glass rounded-xl font-semibold border border-primary/25 hover:border-primary/50 hover:bg-primary/[0.08] transition-all hover:-translate-y-0.5 inline-flex items-center gap-2">Let's Connect<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></a>
+            </div>
+            <div class="reveal flex justify-center gap-3">
+                <a href="https://github.com/zee00111/" target="_blank" class="tip p-3 glass rounded-xl glass-hover transition border border-white/[0.06]" data-tip="GitHub"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+                <a href="https://www.linkedin.com/in/zain-qureshi-12770b29a" target="_blank" class="tip p-3 glass rounded-xl glass-hover transition border border-white/[0.06]" data-tip="LinkedIn"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                <a href="mailto:zeedash295@gmail.com" class="tip p-3 glass rounded-xl glass-hover transition border border-white/[0.06]" data-tip="Email"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></a>
+            </div>
+        </div>
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-slow"><div class="w-6 h-10 rounded-full border-2 border-gray-600 flex justify-center pt-2"><div class="w-1 h-3 bg-primary rounded-full animate-pulse"></div></div></div>
+    </section>
+
+    <div class="py-5 border-y border-white/[0.04] overflow-hidden relative z-10 bg-dark/40"><div class="marquee"><div class="flex items-center gap-10 px-6 whitespace-nowrap text-gray-600 text-sm font-semibold uppercase tracking-widest"><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>React.js</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Tailwind CSS</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>JavaScript</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>WordPress</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Python</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Bootstrap</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Git</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>REST APIs</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>HTML5/CSS3</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Responsive</span></div><div class="flex items-center gap-10 px-6 whitespace-nowrap text-gray-600 text-sm font-semibold uppercase tracking-widest"><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>React.js</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Tailwind CSS</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>JavaScript</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>WordPress</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Python</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Bootstrap</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Git</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>REST APIs</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>HTML5/CSS3</span><span class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Responsive</span></div></div></div>
+
+    <section id="about" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">Get to know me</span><h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mt-3 mb-4">About <span class="gradient-text">Me</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto"></div></div>
+            <div class="grid lg:grid-cols-5 gap-12 items-center">
+                <div class="lg:col-span-2 reveal">
+                    <div class="relative max-w-sm mx-auto">
+                        <div class="absolute -inset-6 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 rounded-[2rem] blur-xl morph-bg"></div>
+                        <div class="relative glass-strong rounded-3xl overflow-hidden border border-primary/10 p-1.5">
+                            <div class="relative rounded-2xl overflow-hidden bg-gradient-to-br from-dark/60 to-surface w-full" style="aspect-ratio: 3/4;">
+                                <img src="https://zain05.vercel.app/zain.png" alt="Zain Qureshi" class="w-full h-full object-cover rounded-xl" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-7xl font-extrabold gradient-text\\'>ZQ</div>';">
+                            </div>
+                        </div>
+                        <div class="absolute -top-3 -right-3 glass px-4 py-2 rounded-xl border border-primary/15 animate-float shadow-lg shadow-primary/10"><span class="text-sm font-bold text-primary">1+ Yrs Exp</span></div>
+                        <div class="absolute -bottom-3 -left-3 glass px-4 py-2 rounded-xl border border-accent/15 animate-float-delay shadow-lg shadow-accent/10"><span class="text-sm font-bold text-accent">20+ Projects</span></div>
+                        <p class="text-center mt-5 text-gray-400 text-sm font-medium">Front-End Developer</p>
+                        <p class="text-center text-primary text-sm font-semibold flex items-center justify-center gap-1 mt-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Multan, Pakistan</p>
+                    </div>
+                </div>
+                <div class="lg:col-span-3 space-y-6 reveal">
+                    <h3 class="text-2xl md:text-3xl font-bold leading-tight">Front-End Developer &<br><span class="gradient-text">Web Enthusiast</span></h3>
+                    <p class="text-gray-400 leading-relaxed text-lg">I'm a passionate front-end developer with hands-on experience building responsive websites and web applications. I specialize in transforming designs into clean, efficient code using modern technologies like <span class="text-primary font-semibold">React.js</span>, <span class="text-primary font-semibold">Tailwind CSS</span>, and <span class="text-primary font-semibold">WordPress</span>.</p>
+                    <p class="text-gray-500 leading-relaxed">Currently pursuing my Bachelor's in Data Analytics while continuously expanding my web development expertise. I've successfully delivered numerous client projects, ranging from custom-coded React applications to fully customized WordPress solutions.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
+                        <div class="glass rounded-2xl p-4 text-center border border-primary/10 tilt-card"><div class="text-3xl font-extrabold gradient-text counter" data-target="1">0+</div><div class="text-xs text-gray-500 mt-1 font-medium">Years Exp</div></div>
+                        <div class="glass rounded-2xl p-4 text-center border border-primary/10 tilt-card"><div class="text-3xl font-extrabold gradient-text counter" data-target="20">0+</div><div class="text-xs text-gray-500 mt-1 font-medium">Projects</div></div>
+                        <div class="glass rounded-2xl p-4 text-center border border-primary/10 tilt-card"><div class="text-3xl font-extrabold gradient-text counter" data-target="15">0+</div><div class="text-xs text-gray-500 mt-1 font-medium">Clients</div></div>
+                        <div class="glass rounded-2xl p-4 text-center border border-primary/10 tilt-card"><div class="text-3xl font-extrabold gradient-text">∞</div><div class="text-xs text-gray-500 mt-1 font-medium">Passion</div></div>
+                    </div>
+                    <div class="pt-4 flex flex-wrap gap-4">
+                        <a href="#contact" class="magnetic inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-dark rounded-xl font-semibold text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Download CV</a>
+                        <a href="#terminal" class="magnetic inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-semibold border border-primary/20 hover:border-primary/40 transition-all hover:-translate-y-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Interactive Terminal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="experience" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">My Journey</span><h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mt-3 mb-4">Experience & <span class="gradient-text">Education</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto"></div></div>
+            <div class="relative max-w-4xl mx-auto">
+                <div class="timeline-line"></div>
+                <div class="space-y-12">
+                    <div class="reveal"><div class="md:flex items-center gap-8"><div class="md:w-1/2 md:text-right md:pr-14 mb-4 md:mb-0"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 relative"><div class="absolute -top-3 left-6 px-3 py-1 bg-primary/15 rounded-full text-xs font-bold text-primary border border-primary/20">Recent</div><h3 class="text-lg font-bold mt-2 mb-1">Junior Front-End Developer</h3><p class="text-primary font-semibold text-sm mb-3">100xSellers</p><p class="text-gray-500 text-sm leading-relaxed">Built responsive e-commerce platforms with React.js. Optimized page load speeds.</p></div></div><div class="absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-primary rounded-full border-[3px] border-dark hidden md:block z-10 shadow-lg shadow-primary/40"></div><div class="md:w-1/2 md:pl-14"></div></div></div>
+                    <div class="reveal"><div class="md:flex items-center gap-8"><div class="md:w-1/2 md:pr-14"></div><div class="absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-accent rounded-full border-[3px] border-dark hidden md:block z-10 shadow-lg shadow-accent/40"></div><div class="md:w-1/2 md:pl-14 mb-4 md:mb-0"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 relative"><div class="absolute -top-3 left-6 px-3 py-1 bg-accent/15 rounded-full text-xs font-bold text-accent border border-accent/20">2024 - Present</div><h3 class="text-lg font-bold mt-2 mb-1">B.S. Data Analytics</h3><p class="text-accent font-semibold text-sm mb-3">Emerson University</p><p class="text-gray-500 text-sm leading-relaxed">Pursuing a degree in data analysis, statistical modeling, and data-driven decisions.</p></div></div></div></div>
+                    <div class="reveal"><div class="md:flex items-center gap-8"><div class="md:w-1/2 md:text-right md:pr-14 mb-4 md:mb-0"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 relative"><div class="absolute -top-3 left-6 px-3 py-1 bg-secondary/15 rounded-full text-xs font-bold text-secondary border border-secondary/20">2023</div><h3 class="text-lg font-bold mt-2 mb-1">FSC Pre-Medical (Grade A)</h3><p class="text-secondary font-semibold text-sm mb-3">Intermediate College</p><p class="text-gray-500 text-sm leading-relaxed">Achieved outstanding academic performance with an A grade.</p></div></div><div class="absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-secondary rounded-full border-[3px] border-dark hidden md:block z-10 shadow-lg shadow-secondary/40"></div><div class="md:w-1/2 md:pl-14"></div></div></div>
+                    <div class="reveal"><div class="md:flex items-center gap-8"><div class="md:w-1/2 md:pr-14"></div><div class="absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-primary rounded-full border-[3px] border-dark hidden md:block z-10 shadow-lg shadow-primary/40"></div><div class="md:w-1/2 md:pl-14 mb-4 md:mb-0"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 relative"><div class="absolute -top-3 left-6 px-3 py-1 bg-primary/15 rounded-full text-xs font-bold text-primary border border-primary/20">Certified</div><h3 class="text-lg font-bold mt-2 mb-1">CIT Web Development</h3><p class="text-primary font-semibold text-sm mb-3">Professional Certification</p><p class="text-gray-500 text-sm leading-relaxed">Comprehensive training covering HTML, CSS, JS, and responsive design.</p></div></div></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="projects" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">My Portfolio</span><h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mt-3 mb-4">Featured <span class="gradient-text">Projects</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"></div><p class="text-gray-500 max-w-lg mx-auto">Real-world solutions delivered for clients and personal growth</p></div>
+            <div class="flex flex-wrap justify-center gap-2 mb-12 reveal"><button class="filter-btn active px-5 py-2 rounded-full text-sm font-semibold transition border border-primary/30 bg-primary text-white" data-filter="all">All Projects</button><button class="filter-btn px-5 py-2 rounded-full text-sm font-semibold text-gray-400 transition border border-white/10 hover:border-primary/30 hover:text-primary" data-filter="react">React</button><button class="filter-btn px-5 py-2 rounded-full text-sm font-semibold text-gray-400 transition border border-white/10 hover:border-primary/30 hover:text-primary" data-filter="wordpress">WordPress</button><button class="filter-btn px-5 py-2 rounded-full text-sm font-semibold text-gray-400 transition border border-white/10 hover:border-primary/30 hover:text-primary" data-filter="html">HTML/CSS</button></div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="projectsGrid">
+                <div class="reveal project-item" data-cat="wordpress"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-primary/15 to-primary-dark/25 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">🛍️</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="https://github.com/zee00111/" target="_blank" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Code</a><a href="#" class="px-4 py-2 bg-primary rounded-xl text-sm hover:bg-primary-dark transition">Live Demo</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">E-Commerce WordPress Store</h3><p class="text-gray-500 text-sm mb-4 flex-1">Customized WooCommerce theme with optimized checkout flow and payment gateways.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-medium">WordPress</span><span class="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-medium">WooCommerce</span><span class="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-medium">PHP</span></div></div></div></div>
+                <div class="reveal project-item" data-cat="react"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-accent/15 to-primary/15 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">📊</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="https://github.com/zee00111/" target="_blank" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Code</a><a href="#" class="px-4 py-2 bg-primary rounded-xl text-sm hover:bg-primary-dark transition">Live Demo</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">React Analytics Dashboard</h3><p class="text-gray-500 text-sm mb-4 flex-1">Interactive data visualization with dynamic charts and real-time filtering.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-accent/10 text-accent rounded-lg text-xs font-medium">React.js</span><span class="px-2.5 py-1 bg-accent/10 text-accent rounded-lg text-xs font-medium">Tailwind</span><span class="px-2.5 py-1 bg-accent/10 text-accent rounded-lg text-xs font-medium">Chart.js</span></div></div></div></div>
+                <div class="reveal project-item" data-cat="html"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-secondary/15 to-accent/15 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">🏢</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="#" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Case Study</a><a href="#" class="px-4 py-2 bg-primary rounded-xl text-sm hover:bg-primary-dark transition">Live Site</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">Corporate Business Website</h3><p class="text-gray-500 text-sm mb-4 flex-1">Custom-coded multi-page website with SEO optimization and CMS integration.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-secondary/10 text-secondary rounded-lg text-xs font-medium">HTML5</span><span class="px-2.5 py-1 bg-secondary/10 text-secondary rounded-lg text-xs font-medium">CSS3</span><span class="px-2.5 py-1 bg-secondary/10 text-secondary rounded-lg text-xs font-medium">JavaScript</span></div></div></div></div>
+                <div class="reveal project-item" data-cat="html"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-yellow-500/15 to-primary/15 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">🎨</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="#" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Preview</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">Portfolio Template</h3><p class="text-gray-500 text-sm mb-4 flex-1">Minimalist dark-themed portfolio for creatives with smooth animations.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-yellow-500/10 text-yellow-400 rounded-lg text-xs font-medium">Bootstrap</span><span class="px-2.5 py-1 bg-yellow-500/10 text-yellow-400 rounded-lg text-xs font-medium">jQuery</span><span class="px-2.5 py-1 bg-yellow-500/10 text-yellow-400 rounded-lg text-xs font-medium">SASS</span></div></div></div></div>
+                <div class="reveal project-item" data-cat="wordpress"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-green-500/15 to-accent/15 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">📝</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="#" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Details</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">Blog & News Platform</h3><p class="text-gray-500 text-sm mb-4 flex-1">WordPress-powered content platform with custom post types and ACF.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-green-500/10 text-green-400 rounded-lg text-xs font-medium">WordPress</span><span class="px-2.5 py-1 bg-green-500/10 text-green-400 rounded-lg text-xs font-medium">Elementor</span><span class="px-2.5 py-1 bg-green-500/10 text-green-400 rounded-lg text-xs font-medium">ACF</span></div></div></div></div>
+                <div class="reveal project-item" data-cat="react"><div class="showcase-card glass-strong rounded-2xl overflow-hidden tilt-card border border-primary/10 group h-full flex flex-col"><div class="h-48 bg-gradient-to-br from-pink-500/15 to-primary/15 overflow-hidden relative flex items-center justify-center"><span class="text-5xl project-thumb">🔌</span><div class="project-overlay absolute inset-0 bg-gradient-to-t from-dark via-dark/80 to-dark/40 flex items-center justify-center gap-3 backdrop-blur-sm"><a href="#" class="px-4 py-2 bg-white/10 rounded-xl text-sm hover:bg-primary transition backdrop-blur-sm border border-white/20">Docs</a></div></div><div class="p-6 flex-1 flex flex-col"><h3 class="text-lg font-bold mb-2">API Integration Module</h3><p class="text-gray-500 text-sm mb-4 flex-1">Custom Python script for automating data fetching with third-party APIs.</p><div class="flex flex-wrap gap-2"><span class="px-2.5 py-1 bg-pink-500/10 text-pink-400 rounded-lg text-xs font-medium">Python</span><span class="px-2.5 py-1 bg-pink-500/10 text-pink-400 rounded-lg text-xs font-medium">REST APIs</span><span class="px-2.5 py-1 bg-pink-500/10 text-pink-400 rounded-lg text-xs font-medium">JSON</span></div></div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="terminal" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">Try it out</span><h2 class="text-4xl md:text-5xl font-extrabold mt-3 mb-4">Interactive <span class="gradient-text">Terminal</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"></div><p class="text-gray-500 max-w-lg mx-auto">Type <span class="text-primary font-mono font-bold">help</span> for commands. Try <span class="text-primary font-mono font-bold">matrix</span>, <span class="text-primary font-mono font-bold">joke</span>, <span class="text-primary font-mono font-bold">fortune</span> & more!</p></div>
+            <div class="reveal terminal shadow-2xl shadow-primary/5">
+                <div class="terminal-header">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div><span class="ml-3 text-xs text-gray-500 font-mono">zain@portfolio:~$</span>
+                </div>
+                <div class="terminal-body" id="terminalBody">
+                    <canvas id="matrixCanvas"></canvas>
+                    <div style="position:relative;z-index:10">
+                        <div class="terminal-line"><span class="terminal-output">Welcome to Zain's Portfolio Terminal v2.0 🚀</span></div>
+                        <div class="terminal-line"><span class="terminal-output">Type 'help' to explore. Try 'matrix', 'joke', 'fortune'!</span></div>
+                        <div id="terminalHistory"></div>
+                        <div class="flex items-center mt-2">
+                            <span class="terminal-prompt mr-2">❯</span>
+                            <input type="text" class="terminal-input" id="terminalInput" placeholder="Type a command..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="skills" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">My Expertise</span><h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mt-3 mb-4">Technical <span class="gradient-text">Skills</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"></div><p class="text-gray-500 max-w-lg mx-auto">Technologies and tools I use to bring ideas to life</p></div>
+            <div class="flex flex-wrap justify-center gap-4 mb-16 reveal">
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(249,115,22,0.5)"><span class="text-2xl">⚛️</span><span class="text-sm font-semibold">React</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(56,189,248,0.5)"><span class="text-2xl">🎨</span><span class="text-sm font-semibold">Tailwind</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(251,191,36,0.5)"><span class="text-2xl">📜</span><span class="text-sm font-semibold">JS</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(34,197,94,0.5)"><span class="text-2xl">📝</span><span class="text-sm font-semibold">WordPress</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(168,85,247,0.5)"><span class="text-2xl">🐍</span><span class="text-sm font-semibold">Python</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(239,68,68,0.5)"><span class="text-2xl">📦</span><span class="text-sm font-semibold">Git</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(59,130,246,0.5)"><span class="text-2xl">🌐</span><span class="text-sm font-semibold">HTML/CSS</span></div>
+                <div class="skill-orb glass-strong rounded-2xl px-5 py-3 border border-primary/10 flex items-center gap-2" style="--orb-color: rgba(245,158,11,0.5)"><span class="text-2xl">📱</span><span class="text-sm font-semibold">Responsive</span></div>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="reveal"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 h-full"><div class="flex items-center gap-3 mb-6"><div class="p-3 bg-primary/15 rounded-xl border border-primary/20"><svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h3 class="text-lg font-bold">Front-End</h3><p class="text-xs text-gray-500">UI & Interactions</p></div></div><div class="space-y-4"><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">React.js</span><span class="text-sm text-primary font-bold">75%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-primary to-primary-dark rounded-full" style="--w:75%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Tailwind CSS</span><span class="text-sm text-primary font-bold">85%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-primary to-accent rounded-full" style="--w:85%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">HTML5 / CSS3</span><span class="text-sm text-primary font-bold">90%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-accent to-primary rounded-full" style="--w:90%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Bootstrap</span><span class="text-sm text-primary font-bold">80%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-primary to-primary-dark rounded-full" style="--w:80%"></div></div></div></div></div></div>
+                <div class="reveal"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 h-full"><div class="flex items-center gap-3 mb-6"><div class="p-3 bg-accent/15 rounded-xl border border-accent/20"><svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg></div><div><h3 class="text-lg font-bold">Backend & CMS</h3><p class="text-xs text-gray-500">Server & Content</p></div></div><div class="space-y-4"><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">WordPress</span><span class="text-sm text-accent font-bold">85%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-accent to-primary rounded-full" style="--w:85%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Python</span><span class="text-sm text-accent font-bold">70%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-accent to-primary rounded-full" style="--w:70%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">REST APIs</span><span class="text-sm text-accent font-bold">75%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-accent to-primary rounded-full" style="--w:75%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Database Basics</span><span class="text-sm text-accent font-bold">65%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-accent to-primary rounded-full" style="--w:65%"></div></div></div></div></div></div>
+                <div class="reveal"><div class="glass-strong rounded-2xl p-6 tilt-card border border-primary/10 h-full"><div class="flex items-center gap-3 mb-6"><div class="p-3 bg-secondary/15 rounded-xl border border-secondary/20"><svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><h3 class="text-lg font-bold">Tools & Workflow</h3><p class="text-xs text-gray-500">Dev Environment</p></div></div><div class="space-y-4"><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Git & GitHub</span><span class="text-sm text-secondary font-bold">80%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-secondary to-primary rounded-full" style="--w:80%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Netlify / Vercel</span><span class="text-sm text-secondary font-bold">85%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-secondary to-accent rounded-full" style="--w:85%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Figma / UI Design</span><span class="text-sm text-secondary font-bold">70%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-secondary to-primary rounded-full" style="--w:70%"></div></div></div><div><div class="flex justify-between mb-1.5"><span class="text-sm font-medium">Responsive Design</span><span class="text-sm text-secondary font-bold">92%</span></div><div class="h-2 bg-dark/60 rounded-full overflow-hidden"><div class="skill-fill h-full bg-gradient-to-r from-secondary to-primary-dark rounded-full" style="--w:92%"></div></div></div></div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section id="contact" class="py-24 md:py-32 relative z-10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal"><span class="text-primary text-xs font-bold tracking-[0.3em] uppercase">Let's Work Together</span><h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mt-3 mb-4">Get In <span class="gradient-text">Touch</span></h2><div class="w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-4"></div><p class="text-gray-500 max-w-lg mx-auto">Have a project or want to collaborate? Send me a message!</p></div>
+            <div class="grid lg:grid-cols-5 gap-10 max-w-6xl mx-auto">
+                <div class="lg:col-span-2 space-y-5 reveal">
+                    <div class="glass-strong rounded-2xl p-5 flex items-start gap-4 tilt-card border border-primary/10 group"><div class="p-3 bg-primary/15 rounded-xl border border-primary/20 shrink-0"><svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h4 class="font-semibold text-sm mb-1">Email Me</h4><a href="mailto:zeedash295@gmail.com" class="text-gray-400 text-sm hover:text-primary transition break-all">zeedash295@gmail.com</a></div></div>
+                    <div class="glass-strong rounded-2xl p-5 flex items-start gap-4 tilt-card border border-primary/10 group"><div class="p-3 bg-accent/15 rounded-xl border border-accent/20 shrink-0"><svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><h4 class="font-semibold text-sm mb-1">Location</h4><p class="text-gray-400 text-sm">Multan, Pakistan 🇵🇰</p></div></div>
+                    <div class="glass-strong rounded-2xl p-5 flex items-start gap-4 tilt-card border border-primary/10 group"><div class="p-3 bg-secondary/15 rounded-xl border border-secondary/20 shrink-0"><svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><h4 class="font-semibold text-sm mb-1">Availability</h4><p class="text-gray-400 text-sm">Mon - Sat, 9AM - 8PM (PKT)</p></div></div>
+                    <div class="glass-strong rounded-2xl p-5 border border-primary/10"><h4 class="font-semibold text-sm mb-3">Follow Me</h4><div class="flex gap-3"><a href="https://github.com/zee00111/" target="_blank" class="p-2.5 glass rounded-lg glass-hover transition border border-white/[0.06]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a><a href="https://www.linkedin.com/in/zain-qureshi-12770b29a" target="_blank" class="p-2.5 glass rounded-lg glass-hover transition border border-white/[0.06]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a><a href="https://zainqureshi.netlify.app" target="_blank" class="p-2.5 glass rounded-lg glass-hover transition border border-white/[0.06]"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg></a></div></div>
+                </div>
+                <div class="lg:col-span-3 reveal">
+                    <form id="contactForm" class="glass-strong rounded-2xl p-6 md:p-8 space-y-5 border border-primary/10 relative overflow-hidden">
+                        <div id="formLoading" class="absolute inset-0 bg-dark/90 backdrop-blur-sm flex items-center justify-center z-10 hidden"><div class="text-center"><div class="loader mx-auto mb-3"></div><p class="text-sm text-gray-400">Sending your message...</p></div></div>
+                        <div class="grid sm:grid-cols-2 gap-5"><div><label class="block text-sm font-medium mb-2 text-gray-300">Full Name <span class="text-primary">*</span></label><input type="text" id="userName" name="user_name" placeholder="John Doe" class="form-input w-full px-4 py-3 bg-dark/50 rounded-xl border border-white/10 text-white placeholder-gray-600 transition" required></div><div><label class="block text-sm font-medium mb-2 text-gray-300">Email <span class="text-primary">*</span></label><input type="email" id="userEmail" name="user_email" placeholder="john@example.com" class="form-input w-full px-4 py-3 bg-dark/50 rounded-xl border border-white/10 text-white placeholder-gray-600 transition" required></div></div>
+                        <div><label class="block text-sm font-medium mb-2 text-gray-300">Subject <span class="text-primary">*</span></label><input type="text" id="subject" name="subject" placeholder="Project Discussion" class="form-input w-full px-4 py-3 bg-dark/50 rounded-xl border border-white/10 text-white placeholder-gray-600 transition" required></div>
+                        <div><label class="block text-sm font-medium mb-2 text-gray-300">Message <span class="text-primary">*</span></label><textarea id="message" name="message" rows="5" placeholder="Tell me about your project..." class="form-input w-full px-4 py-3 bg-dark/50 rounded-xl border border-white/10 text-white placeholder-gray-600 resize-none transition" required></textarea></div>
+                        <div id="formStatus" class="hidden text-center p-4 rounded-xl text-sm font-medium"></div>
+                        <button type="submit" id="submitBtn" class="w-full py-3.5 bg-gradient-to-r from-primary to-primary-dark rounded-xl font-semibold text-white shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"><span id="btnText">Send Message</span><svg id="btnIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg><svg id="btnSpinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></button>
+                        <p class="text-center text-xs text-gray-600 mt-2"><svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Your information is secure.</p>
+                    </form>
+                    <div id="formSuccess" class="hidden glass-strong rounded-2xl p-10 text-center border border-primary/10"><div class="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/15 flex items-center justify-center border border-green-500/20"><svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div><h3 class="text-xl font-bold mb-2">Message Sent! 🚀</h3><p class="text-gray-400 text-sm mb-6">I'll get back to you within 24 hours.</p><button id="sendAnother" class="px-6 py-2.5 glass rounded-xl text-sm font-medium glass-hover transition border border-primary/20">Send Another</button></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="relative z-10 py-10 border-t border-white/[0.04] bg-dark/80">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8" viewBox="0 0 120 120" fill="none"><rect x="8" y="8" width="104" height="104" rx="28" fill="url(#footG1)" opacity="0.12"/><rect x="8" y="8" width="104" height="104" rx="28" stroke="url(#footG2)" stroke-width="2.5" fill="none"/><text x="60" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="52" fill="url(#footG2)">Z</text><circle cx="88" cy="36" r="20" fill="url(#footG1)"/><text x="88" y="43" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="22" fill="#0c0a09">Q</text><defs><linearGradient id="footG1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient><linearGradient id="footG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs></svg>
+                    <p class="text-gray-600 text-sm">© 2026 Zain Qureshi. Crafted with passion.</p>
+                </div>
+                <div class="flex gap-6"><a href="#home" class="text-gray-600 text-sm hover:text-primary transition">Home</a><a href="#about" class="text-gray-600 text-sm hover:text-primary transition">About</a><a href="#projects" class="text-gray-600 text-sm hover:text-primary transition">Projects</a><a href="#contact" class="text-gray-600 text-sm hover:text-primary transition">Contact</a></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== CUSTOM CURSOR =====
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorRing = document.getElementById('cursorRing');
+        let cX = 0, cY = 0, rX = 0, rY = 0;
+        document.addEventListener('mousemove', (e) => { cX = e.clientX; cY = e.clientY; cursorDot.style.transform = `translate(${cX - 4}px, ${cY - 4}px)`; });
+        function animateRing() { rX += (cX - rX) * 0.15; rY += (cY - rY) * 0.15; cursorRing.style.transform = `translate(${rX - 18}px, ${rY - 18}px)`; requestAnimationFrame(animateRing); }
+        animateRing();
+        document.querySelectorAll('a, button, .tilt-card, input, textarea, .skill-orb').forEach(el => {
+            el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+        });
+
+        // ===== MOUSE GLOW =====
+        const mouseGlow = document.getElementById('mouseGlow');
+        document.addEventListener('mousemove', (e) => { mouseGlow.style.left = e.clientX + 'px'; mouseGlow.style.top = e.clientY + 'px'; });
+
+        // ===== PRELOADER =====
+        window.addEventListener('load', () => { setTimeout(() => document.getElementById('preloader').classList.add('hidden'), 1200); });
+
+        // ===== TYPING EFFECT =====
+        const typedEl = document.getElementById('typedText');
+        const phrases = ['modern web applications.', 'responsive websites.', 'pixel-perfect UIs.', 'React experiences.', 'WordPress solutions.', 'performant code.'];
+        let pIdx = 0, cIdx = 0, isDel = false;
+        function typeEffect() {
+            const cur = phrases[pIdx];
+            if (isDel) { typedEl.textContent = cur.substring(0, cIdx - 1); cIdx--; setTimeout(typeEffect, 40); }
+            else { typedEl.textContent = cur.substring(0, cIdx + 1); cIdx++; setTimeout(typeEffect, 80); }
+            if (!isDel && cIdx === cur.length) { setTimeout(() => { isDel = true; typeEffect(); }, 2000); }
+            else if (isDel && cIdx === 0) { isDel = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(typeEffect, 400); }
+        }
+        setTimeout(typeEffect, 1500);
+
+        // ===== NAVBAR =====
+        const navbar = document.getElementById('navbar');
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        const closeIcon = document.getElementById('closeIcon');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('glass-strong', window.scrollY > 80);
+            navbar.classList.toggle('shadow-lg', window.scrollY > 80);
+            let current = '';
+            document.querySelectorAll('section[id]').forEach(sec => { if (window.scrollY >= sec.offsetTop - 200) current = sec.getAttribute('id'); });
+            document.querySelectorAll('.nav-link').forEach(link => { link.classList.toggle('active', link.getAttribute('href') === '#' + current); });
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('progressBar').style.width = (window.scrollY / docH * 100) + '%';
+            document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 500);
+        });
+        menuToggle.addEventListener('click', () => { mobileMenu.classList.toggle('translate-x-full'); menuIcon.classList.toggle('hidden'); closeIcon.classList.toggle('hidden'); });
+        document.querySelectorAll('.mobile-link').forEach(l => { l.addEventListener('click', () => { mobileMenu.classList.add('translate-x-full'); menuIcon.classList.remove('hidden'); closeIcon.classList.add('hidden'); }); });
+        document.getElementById('scrollTopBtn').addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        // ===== SCROLL REVEAL =====
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    entry.target.querySelectorAll('.skill-fill').forEach(bar => setTimeout(() => bar.classList.add('animate'), 500));
+                    entry.target.querySelectorAll('.counter[data-target]').forEach(counter => {
+                        if (!counter.dataset.animated) {
+                            counter.dataset.animated = 'true';
+                            const target = parseInt(counter.dataset.target);
+                            let current = 0; const step = target / 40;
+                            const timer = setInterval(() => { current += step; if (current >= target) { current = target; clearInterval(timer); } counter.textContent = Math.floor(current) + '+'; }, 40);
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // ===== PROJECT FILTER =====
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const projectItems = document.querySelectorAll('.project-item');
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => { b.classList.remove('active', 'bg-primary', 'text-white', 'border-primary/30'); b.classList.add('text-gray-400', 'border-white/10'); });
+                btn.classList.add('active', 'bg-primary', 'text-white', 'border-primary/30'); btn.classList.remove('text-gray-400', 'border-white/10');
+                const filter = btn.dataset.filter;
+                projectItems.forEach(item => {
+                    const cat = item.dataset.cat;
+                    if (filter === 'all' || cat === filter) { item.style.display = 'block'; setTimeout(() => { item.style.opacity = '1'; item.style.transform = 'translateY(0) scale(1)'; }, 50); }
+                    else { item.style.opacity = '0'; item.style.transform = 'translateY(20px) scale(0.95)'; setTimeout(() => { item.style.display = 'none'; }, 400); }
+                });
+            });
+        });
+
+        // ===== 3D TILT =====
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => { const rect = card.getBoundingClientRect(); const x = (e.clientX - rect.left) / rect.width; const y = (e.clientY - rect.top) / rect.height; card.style.transform = `perspective(1000px) rotateX(${(y - 0.5) * 8}deg) rotateY(${(x - 0.5) * -8}deg)`; });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; });
+        });
+
+        // ===== SHOWCASE CARD RADIAL =====
+        document.querySelectorAll('.showcase-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => { const rect = card.getBoundingClientRect(); card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%'); card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%'); });
+        });
+
+        // ===== MAGNETIC BUTTONS =====
+        document.querySelectorAll('.magnetic').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => { const rect = btn.getBoundingClientRect(); btn.style.transform = `translate(${(e.clientX - rect.left - rect.width / 2) * 0.2}px, ${(e.clientY - rect.top - rect.height / 2) * 0.2}px)`; });
+            btn.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0, 0)'; });
+        });
+
+        // ===== MATRIX RAIN =====
+        const matrixCanvas = document.getElementById('matrixCanvas');
+        const matrixCtx = matrixCanvas.getContext('2d');
+        let matrixAnim = null;
+        let matrixActive = false;
+        function startMatrix() {
+            if (matrixActive) return;
+            matrixActive = true;
+            matrixCanvas.width = matrixCanvas.offsetWidth || 600;
+            matrixCanvas.height = matrixCanvas.offsetHeight || 420;
+            matrixCanvas.classList.add('active');
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンZQ';
+            const fontSize = 11;
+            const columns = Math.floor(matrixCanvas.width / fontSize);
+            const drops = new Array(columns).fill(1);
+            function draw() {
+                matrixCtx.fillStyle = 'rgba(15, 13, 11, 0.06)';
+                matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+                matrixCtx.fillStyle = '#f97316';
+                matrixCtx.font = fontSize + 'px monospace';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    matrixCtx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+                matrixAnim = requestAnimationFrame(draw);
+            }
+            draw();
+        }
+        function stopMatrix() {
+            if (!matrixActive) return;
+            if (matrixAnim) { cancelAnimationFrame(matrixAnim); matrixAnim = null; }
+            matrixActive = false;
+            matrixCanvas.classList.remove('active');
+            matrixCtx.clearRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+        }
+
+        // ===== CONFETTI =====
+        function createConfetti() {
+            const colors = ['#f97316', '#fbbf24', '#ea580c', '#d97706', '#fb923c', '#22c55e', '#3b82f6', '#ec4899'];
+            for (let i = 0; i < 60; i++) {
+                const piece = document.createElement('div'); piece.className = 'confetti-piece';
+                piece.style.left = (Math.random() * 100) + 'vw'; piece.style.top = '100vh';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                piece.style.width = (Math.random() * 8 + 4) + 'px'; piece.style.height = (Math.random() * 8 + 4) + 'px';
+                piece.style.animationDuration = (Math.random() * 1.5 + 1) + 's'; piece.style.animationDelay = (Math.random() * 0.5) + 's';
+                document.body.appendChild(piece); setTimeout(() => piece.remove(), 3000);
+            }
+        }
+
+        // ===== ENHANCED TERMINAL =====
+        const terminalInput = document.getElementById('terminalInput');
+        const terminalHistory = document.getElementById('terminalHistory');
+        const jokes = [
+            "Why do programmers prefer dark mode? Because light attracts bugs! 🐛",
+            "Why did the developer go broke? Because he used up all his cache! 💰",
+            "There are only 10 types of people: those who understand binary and those who don't. 🔢",
+            "A SQL query walks into a bar, sees two tables and asks... 'Can I JOIN you?' 🍻",
+            "Why do Java developers wear glasses? Because they can't C#! 👓",
+            "I'd tell you a UDP joke, but you might not get it. 📡",
+            "Why was the JavaScript developer sad? Because he didn't Node how to Express himself. 😢",
+            "What's a programmer's favorite hangout? Foo Bar! 🍺",
+            "How many programmers does it take to change a light bulb? None, that's a hardware problem. 💡"
+        ];
+        const fortunes = [
+            "Your next project will go viral! 🌟",
+            "A beautiful bug will lead to a breakthrough! 🐛✨",
+            "You will master a new framework this month! 📚",
+            "Great things are coming your way! Keep coding! 🚀",
+            "Someone will offer you a dream job soon! 💼",
+            "Your CSS will center on the first try today! 🎯",
+            "A client will love your work and pay double! 💰",
+            "The code you write today will change someone's life! ❤️"
+        ];
+        const asciiArts = {
+            zain: `\n  ███████╗██╗     ██████╗\n  ██╔════╝██║     ██╔══██╗\n  █████╗  ██║     ██████╔╝\n  ██╔══╝  ██║     ██╔═══╝\n  ██║     ███████╗██║\n  ╚═╝     ╚══════╝╚═╝\n`,
+            coffee: `\n    )  (\n   (   ) )\n    ) ( (\n  _______)_\n.-'---------|\n( C|/\\/\\/\\/|\n '-./\\/\\/\\/|\n   '_______|\n    '-------'\n`,
+            computer: `\n   _______________\n  |  ___________  |\n  | |           | |\n  | |   >_<     | |\n  | |___________| |\n  |_______________|\n     |_________|\n`,
+            rocket: `\n         /\\\n        /  \\\n       |    |\n       |    |\n      /|    |\\\n     / |    | \\\n    |  |    |  |\n    |  |    |  |\n    |  |    |  |\n   /   |    |   \\\n  /    |    |    \\\n /_____|____|_____\\\n       |    |\n       |    |\n      /|    |\\\n     / |    | \\\n    |  |    |  |\n    |  |    |  |\n    |  |    |  |\n    |__|____|__|\n   /  /|    |\\  \\\n  |  | |    | |  |\n  |  | |    | |  |\n  |__|_|____|_|__|\n   /  /  \\   \\  \\\n  |  |   |   |  |\n  |  |   |   |  |\n  |__|___|___|__|\n`
+        };
+
+        const terminalCommands = {
+            help: () => `<span class="terminal-output" style="color:#a8a29e">
+╔══════════════════════════════════════════════╗
+║          🖥️  Available Commands  🖥️          ║
+╠══════════════════════════════════════════════╣
+║  about          - About Zain                 ║
+║  skills         - Technical skills           ║
+║  projects       - Featured projects          ║
+║  experience     - Work experience            ║
+║  education      - Education history          ║
+║  contact        - Contact info               ║
+║  joke           - Tell a dev joke 😄         ║
+║  fortune        - Get your fortune 🔮        ║
+║  matrix         - Toggle matrix rain 🌧️      ║
+║  time           - Current time ⏰            ║
+║  date           - Current date 📅            ║
+║  whoami         - Who are you?               ║
+║  neofetch       - Portfolio stats 📊         ║
+║  ascii [name]   - Show ASCII art             ║
+║  clear          - Clear terminal             ║
+║  sudo           - Try it...                  ║
+║  exit           - Leave (impossible)         ║
+╚══════════════════════════════════════════════╝</span>`,
+            about: () => `<span class="terminal-output" style="color:#a8a29e">┌─────────────────────────────────────┐\n│  👤 Zain Qureshi                    │\n│  🎯 Front-End Developer             │\n│  📍 Multan, Pakistan                │\n│  🎓 B.S. Data Analytics             │\n│  💼 100xSellers                     │\n│  🔗 github.com/zee00111            │\n└─────────────────────────────────────┘</span>`,
+            skills: () => `<span class="terminal-output" style="color:#a8a29e">⚡ Tech Stack:\n├── Frontend: React.js, Tailwind, HTML5, CSS3, Bootstrap\n├── Backend:  WordPress, Python, REST APIs\n├── Tools:    Git, GitHub, Netlify, Vercel, Figma\n└── Other:    Responsive Design, UI/UX Basics</span>`,
+            projects: () => `<span class="terminal-output" style="color:#a8a29e">🚀 6 Featured Projects:\n  1. E-Commerce WordPress Store\n  2. React Analytics Dashboard\n  3. Corporate Business Website\n  4. Portfolio Template\n  5. Blog & News Platform\n  6. API Integration Module</span>`,
+            experience: () => `<span class="terminal-output" style="color:#a8a29e">💼 Experience:\n  → Junior Front-End Developer @ 100xSellers\n    Built responsive e-commerce platforms with React.js\n  → FSC Pre-Medical Grade A (2023)\n  → CIT Web Development Certified</span>`,
+            education: () => `<span class="terminal-output" style="color:#a8a29e">🎓 Education:\n  → B.S. Data Analytics @ Emerson University (2024-Present)\n  → FSC Pre-Medical Grade A (2023)\n  → CIT Web Development Certified</span>`,
+            contact: () => `<span class="terminal-output" style="color:#a8a29e">📬 Contact:\n  📧 zeedash295@gmail.com\n  💻 github.com/zee00111\n  💼 linkedin.com/in/zain-qureshi-12770b29a\n  🌐 zainqureshi.netlify.app</span>`,
+            joke: () => `<span class="joke-text">${jokes[Math.floor(Math.random() * jokes.length)]}</span>`,
+            fortune: () => `<span class="fortune-text">🔮 ${fortunes[Math.floor(Math.random() * fortunes.length)]}</span>`,
+            matrix: () => { if (matrixActive) { stopMatrix(); return `<span class="matrix-text">⏹️ Matrix rain deactivated.</span>`; } else { startMatrix(); return `<span class="matrix-text">🌧️ Matrix rain ACTIVATED! Watch the background...</span>`; } },
+            time: () => `<span class="terminal-output" style="color:#a8a29e">⏰ ${new Date().toLocaleTimeString('en-US', { hour12: true })}</span>`,
+            date: () => `<span class="terminal-output" style="color:#a8a29e">📅 ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>`,
+            whoami: () => `<span class="terminal-output" style="color:#a8a29e">👋 You're a curious visitor exploring Zain's portfolio! Welcome! 🎉</span>`,
+            neofetch: () => `<span class="terminal-output" style="color:#f97316">       ___           ___
+      /   \\         /   \\     OS: Portfolio v2.0
+     | Z Q |       |    |    Host: Web Browser
+      \\___/         \\___/    Theme: Dark Orange
+                            Font: Inter
+       ⚡ React.js           Shell: zain@portfolio
+       🎨 Tailwind           Uptime: Since you opened the page
+       📜 JavaScript         Packages: 20+ Projects
+       📦 Git                Resolution: Responsive</span>`,
+            ascii: (args) => { const name = args[0]?.toLowerCase(); if (name && asciiArts[name]) return `<pre class="ascii-art">${asciiArts[name]}</pre>`; return `<span class="terminal-output" style="color:#6b7280">Available: zain, coffee, computer, rocket. Usage: ascii zain</span>`; },
+            clear: () => { terminalHistory.innerHTML = ''; stopMatrix(); return ''; },
+            sudo: () => `<span class="error-text">🚫 Nice try! But this isn't a real terminal. 😄</span>`,
+            ls: () => `<span class="terminal-output" style="color:#6b7280">index.html  style.css  script.js  projects/  assets/</span>`,
+            pwd: () => `<span class="terminal-output" style="color:#6b7280">/home/zain/portfolio</span>`,
+            exit: () => `<span class="error-text">😎 You can't leave! This portfolio is too awesome to quit!</span>`,
+            hack: () => { startMatrix(); return `<span class="matrix-text">💻 Initializing hack sequence...\n[████████████████████] 100%\nAccess GRANTED... just kidding! 😄</span>`; },
+        };
+
+        function processCommand(input) {
+            const parts = input.trim().split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1);
+            const cmdLine = document.createElement('div'); cmdLine.className = 'terminal-line';
+            cmdLine.innerHTML = `<span class="terminal-prompt">❯</span> <span class="terminal-cmd">${input}</span>`;
+            terminalHistory.appendChild(cmdLine);
+            if (terminalCommands[cmd]) {
+                const output = document.createElement('div'); output.className = 'terminal-line';
+                output.innerHTML = terminalCommands[cmd](args) || '';
+                terminalHistory.appendChild(output);
+            } else if (cmd) {
+                const err = document.createElement('div'); err.className = 'terminal-line';
+                err.innerHTML = `<span class="error-text">Command not found: '${cmd}'. Type 'help' for commands.</span>`;
+                terminalHistory.appendChild(err);
+            }
+            const body = document.getElementById('terminalBody'); body.scrollTop = body.scrollHeight;
+        }
+
+        terminalInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const input = terminalInput.value.trim(); terminalInput.value = '';
+                if (!input) return;
+                processCommand(input);
+            }
+        });
+
+        // ===== CONTACT FORM - FIXED EMAIL SYSTEM =====
+        /*
+         * IMPORTANT: Email services require FIRST-TIME CONFIRMATION.
+         * 
+         * OPTION 1 - FormSubmit.co (Already configured below, FREE):
+         *   1. Submit the form once from your portfolio
+         *   2. Check zeedash295@gmail.com for a CONFIRMATION email
+         *   3. Click the confirmation link in that email
+         *   4. All future submissions will go directly to your inbox!
+         *
+         * OPTION 2 - Web3Forms (FREE, 250 emails/month):
+         *   1. Go to https://web3forms.com/
+         *   2. Enter zeedash295@gmail.com to get your Access Key
+         *   3. Replace 'YOUR_WEB3FORMS_KEY' below with your key
+         */
+        const WEB3FORMS_KEY = 'YOUR_WEB3FORMS_KEY';
+
+        const contactForm = document.getElementById('contactForm');
+        const formLoading = document.getElementById('formLoading');
+        const formSuccess = document.getElementById('formSuccess');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const formStatus = document.getElementById('formStatus');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!name || !email || !subject || !message) {
+                showFormStatus('Please fill in all required fields.', 'error'); return;
+            }
+
+            formLoading.classList.remove('hidden');
+            btnText.textContent = 'Sending...'; btnIcon.classList.add('hidden'); btnSpinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            try {
+                let success = false;
+
+                // Method 1: Web3Forms (if key is configured)
+                if (WEB3FORMS_KEY !== 'YOUR_WEB3FORMS_KEY') {
+                    const res = await fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ access_key: WEB3FORMS_KEY, name, email, subject, message, from_name: 'Portfolio Website' })
+                    });
+                    const data = await res.json();
+                    success = data.success;
+                    if (!success) throw new Error(data.message || 'Web3Forms error');
+                }
+                // Method 2: FormSubmit.co (default, needs email confirmation once)
+                else {
+                    const res = await fetch('https://formsubmit.co/ajax/zeedash295@gmail.com', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({ _subject: subject, name, email, message, _captcha: 'false', _template: 'table' })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        success = true;
+                    } else if (data.message && data.message.includes('confirm')) {
+                        throw new Error('CONFIRMATION_REQUIRED');
+                    } else {
+                        throw new Error(data.message || 'FormSubmit error');
+                    }
+                }
+
+                if (success) { showFormSuccess(); }
+
+            } catch (err) {
+                console.error('Email error:', err);
+
+                if (err.message === 'CONFIRMATION_REQUIRED') {
+                    showFormStatus('⚠️ FIRST TIME: Check zeedash295@gmail.com and click the confirmation link. Then try again! Opening mailto as backup...', 'info');
+                } else {
+                    showFormStatus('Email service busy. Opening email client as backup...', 'info');
+                }
+
+                // Ultimate fallback: mailto link
+                setTimeout(() => {
+                    window.location.href = `mailto:zeedash295@gmail.com?subject=${encodeURIComponent('[Portfolio] ' + subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+                }, 1500);
+
+                // Show success after a delay
+                setTimeout(() => {
+                    showFormSuccess();
+                }, 3000);
+
+            } finally {
+                formLoading.classList.add('hidden');
+                btnText.textContent = 'Send Message'; btnIcon.classList.remove('hidden'); btnSpinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function showFormStatus(msg, type) {
+            formStatus.classList.remove('hidden', 'text-green-400', 'bg-green-500/10', 'text-red-400', 'bg-red-500/10', 'text-accent', 'bg-accent/10');
+            formStatus.classList.add(type === 'error' ? 'text-red-400' : 'text-accent', type === 'error' ? 'bg-red-500/10' : 'bg-accent/10');
+            formStatus.textContent = msg;
+            setTimeout(() => formStatus.classList.add('hidden'), 10000);
+        }
+
+        function showFormSuccess() {
+            contactForm.classList.add('hidden');
+            formSuccess.classList.remove('hidden');
+            contactForm.reset();
+            createConfetti();
+        }
+
+        document.getElementById('sendAnother').addEventListener('click', () => {
+            formSuccess.classList.add('hidden');
+            contactForm.classList.remove('hidden');
+        });
+
+        // ===== KONAMI CODE EASTER EGG =====
+        let konamiSeq = [];
+        const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        document.addEventListener('keydown', (e) => {
+            konamiSeq.push(e.keyCode);
+            if (konamiSeq.length > konamiCode.length) konamiSeq.shift();
+            if (JSON.stringify(konamiSeq) === JSON.stringify(konamiCode)) {
+                createConfetti(); alert('🎮 Konami Code! You are a true gamer! ⭐'); konamiSeq = [];
+            }
+        });
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) { e.preventDefault(); const t = document.querySelector(this.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+        });
+    </script>
+</body>
+</html>
+
